@@ -1,6 +1,6 @@
 export async function uploadImageForRating(file: File): Promise<any> {
   const formData = new FormData();
-  formData.append('image', file);
+  formData.append('Picture', file);
 
   const res = await fetch('https://xbut-eryu-hhsg.f2.xano.io/api:TAf2tJRT/SendPicModelRater', {
     method: 'POST',
