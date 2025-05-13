@@ -32,35 +32,37 @@ function App() {
     setError(null);
   };
 
-  const handleSubmit = async () => {
-    if (!imageState.file) {
-      setError('Please select an image first');
+const handleSubmit = async () => {
+  if (!imageState.file) {
+    setError('Please select an image first');
+    return;
+  }
+
+  setIsLoading(true);
+  setError(null);
+
+  try {
+    const response = await uploadImageForRating(imageState.file);
+    let parsedResp = response.resp;
+
+    try {
+      if (typeof response.resp?.[0] === "string") {
+        parsedResp = JSON.parse(response.resp[0]);
+      }
+    } catch (e) {
+      console.error("Failed to parse model response:", e);
+      setError("Invalid response format");
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response = await uploadImageForRating(imageState.file);
-      
-     let parsedResp = response.resp;
-      }
-
-try {
-  if (typeof response.resp?.[0] === "string") {
-    parsedResp = JSON.parse(response.resp[0]);
+    setResult({ ...response, resp: parsedResp });
+  } catch (e) {
+    console.error("Error during submission:", e);
+    setError("An error occurred while submitting the image");
+  } finally {
+    setIsLoading(false);
   }
-} catch (e) {
-  console.error("Failed to parse model response:", e);
-  setError("Invalid response format");
-  return;
-}
-
-setResult({ ...response, resp: parsedResp });
-
-  };
-
+};
   const handleReset = () => {
     handleRemoveImage();
   };
