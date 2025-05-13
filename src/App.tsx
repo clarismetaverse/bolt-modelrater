@@ -44,17 +44,21 @@ function App() {
     try {
       const response = await uploadImageForRating(imageState.file);
       
-      if (response.success && response.resp?.[0]) {
-        setResult(response);
-      } else {
-        setError(response.error || 'Failed to get rating');
+     let parsedResp = response.resp;
       }
-    } catch (err) {
-      console.error('Error during submission:', err);
-      setError('An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
-    }
+
+try {
+  if (typeof response.resp?.[0] === "string") {
+    parsedResp = JSON.parse(response.resp[0]);
+  }
+} catch (e) {
+  console.error("Failed to parse model response:", e);
+  setError("Invalid response format");
+  return;
+}
+
+setResult({ ...response, resp: parsedResp });
+
   };
 
   const handleReset = () => {
